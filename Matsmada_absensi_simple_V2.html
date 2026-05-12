@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi - MTs MA'ARIF 22 MOJOSARI</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+  body{background:#f0f4f8;min-height:100vh}
+  .header{background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:20px;text-align:center;position:sticky;top:0;z-index:100}
+  .header h1{font-size:22px;margin-bottom:5px}
+  .header p{font-size:13px;opacity:.9}
+  .nav{display:flex;background:#fff;border-bottom:2px solid #e2e8f0;overflow-x:auto}
+  .nav-btn{flex:1;padding:14px 10px;border:none;background:#fff;cursor:pointer;font-weight:600;color:#64748b;font-size:13px;transition:.2s;white-space:nowrap}
+  .nav-btn:hover{background:#f1f5f9}
+  .nav-btn.active{background:#1e40af;color:#fff}
+  .container{max-width:900px;margin:0 auto;padding:20px}
+  .card{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .card-title{font-size:18px;font-weight:700;color:#1e293b;margin-bottom:15px;display:flex;align-items:center;gap:8px}
+  .btn{padding:10px 20px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+  .btn-blue{background:#1e40af;color:#fff}
+  .btn-blue:hover{background:#1e3a8a}
+  .btn-green{background:#10b981;color:#fff}
+  .btn-green:hover{background:#059669}
+  .btn-red{background:#ef4444;color:#fff}
+  .btn-red:hover{background:#dc2626}
+  .btn-gray{background:#e2e8f0;color:#475569}
+  .btn-sm{padding:6px 12px;font-size:12px}
+  .form-group{margin-bottom:15px}
+  label{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
+  input,select{width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px}
+  input:focus,select:focus{outline:none;border-color:#3b82f6}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{background:#1e40af;color:#fff;padding:12px;text-align:left;font-size:12px;text-transform:uppercase}
+  td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
+  tr:hover{background:#f8fafc}
+  .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  .b-hadir{background:#d1fae5;color:#065f46}
+  .b-sakit{background:#fef3c7;color:#92400e}
+  .b-izin{background:#ede9fe;color:#5b21b6}
+  .b-alpa{background:#fee2e2;color:#991b1b}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px}
+  .stat{background:#fff;padding:15px;border-radius:10px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);border-top:3px solid #3b82f6}
+  .stat-num{font-size:28px;font-weight:800;color:#1e293b}
+  .stat-label{font-size:11px;color:#64748b;text-transform:uppercase;margin-top:4px}
+  .attendance-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9}
+  .attendance-row:last-child{border-bottom:none}
+  .attendance-name{flex:1;font-size:14px}
+  .attendance-options{display:flex;gap:6px}
+  .att-opt{cursor:pointer;padding:6px 12px;border-radius:20px;border:2px solid #e2e8f0;font-size:12px;font-weight:600;transition:.2s}
+  .att-opt:hover{border-color:#94a3b8}
+  .att-opt.selected-hadir{border-color:#10b981;background:#d1fae5;color:#065f46}
+  .att-opt.selected-sakit{border-color:#f59e0b;background:#fef3c7;color:#92400e}
+  .att-opt.selected-izin{border-color:#8b5cf6;background:#ede9fe;color:#5b21b6}
+  .att-opt.selected-alpa{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+  .toast{position:fixed;top:15px;right:15px;background:#fff;padding:14px 20px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.15);display:none;align-items:center;gap:10px;z-index:1000;border-left:4px solid #10b981}
+  .toast.show{display:flex;animation:slideIn .3s}
+  @keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+  .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}
+  .modal-overlay.active{display:flex}
+  .modal{background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+  .modal-head{padding:20px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+  .modal-body{padding:20px}
+  .modal-foot{padding:15px 20px;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end;gap:10px}
+  .close-btn{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;font-size:18px}
+  .close-btn:hover{background:#ef4444;color:#fff}
+  .wa-box{background:linear-gradient(135deg,#25d366,#128c7e);border-radius:12px;padding:15px;color:#fff;margin-top:15px}
+  .wa-msg{background:#fff;color:#333;padding:12px;border-radius:8px;font-size:13px;line-height:1.6;white-space:pre-wrap;margin-top:10px}
+  .hidden{display:none!important}
+  .empty{text-align:center;padding:40px;color:#94a3b8}
+  .empty svg{width:60px;height:60px;margin-bottom:15px;opacity:.5}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+  @media(max-width:600px){.grid-2{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📋 MTs MA'ARIF 22 MOJOSARI</h1>
+  <p>Sistem Absensi Digital</p>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" data-page="dashboard">🏠 Dashboard</button>
+  <button class="nav-btn" data-page="kelas">👥 Kelas & Siswa</button>
+  <button class="nav-btn" data-page="absensi">✅ Presensi</button>
+  <button class="nav-btn" data-page="rekap">📊 Rekap</button>
+  <button class="nav-btn" data-page="wa">💬 WhatsApp</button>
+  <button class="nav-btn" data-page="setting">⚙️ Pengaturan</button>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg">Berhasil!</span></div>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<div id="page-dashboard">
+  <div class="stats">
+    <div class="stat" style="border-color:#10b981"><div class="stat-num" id="d-siswa">0</div><div class="stat-label">Total Siswa</div></div>
+    <div class="stat" style="border-color:#3b82f6"><div class="stat-num" id="d-kelas">0</div><div class="stat-label">Jumlah Kelas</div></div>
+    <div class="stat" style="border-color:#8b5cf6"><div class="stat-num" id="d-hadir">0%</div><div class="stat-label">Kehadiran Hari Ini</div></div>
+    <div class="stat" style="border-color:#ef4444"><div class="stat-num" id="d-alpa">0</div><div class="stat-label">Tidak Hadir</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📅 Aktivitas Terbaru</div>
+    <div id="d-aktivitas"><div class="empty">Belum ada aktivitas presensi</div></div>
+  </div>
+</div>
+
+<!-- KELAS & SISWA -->
+<div id="page-kelas" class="hidden">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+      <div class="card-title">🏫 Daftar Kelas</div>
+      <button class="btn btn-blue btn-sm" id="btn-tambah-kelas">+ Tambah</button>
+    </div>
+    <table><thead><tr><th>Kelas</th><th>Wali Kelas</th><th>Siswa</th><th>Aksi</th></tr></thead><tbody id="list-kelas"></tbody></table>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px">
+      <div class="card-title">🎓 Daftar Siswa</div>
+      <div style="display:flex;gap:8px">
+        <select id="filter-kelas-siswa" style="width:140px"><option value="">Semua Kelas</option></select>
+        <button class="btn btn-blue btn-sm" id="btn-tambah-siswa">+ Tambah</button>
+      </div>
+    </div>
+    <input type="text" id="cari-siswa" placeholder="🔍 Cari nama atau NISN..." style="margin-bottom:15px">
+    <table><thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>JK</th><th>HP Wali</th><th>Aksi</th></tr></thead><tbody id="list-siswa"></tbody></table>
+  </div>
+</div>
+
+<!-- PRESENSI -->
+<div id="page-absensi" class="hidden">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px">
+      <div class="card-title">✅ Presensi Harian</div>
+      <div style="display:flex;gap:8px">
+        <input type="date" id="tgl-absen">
+        <select id="pilih-kelas-absen"><option value="">Pilih Kelas</option></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:5px;margin-bottom:15px">
+      <button class="btn btn-blue btn-sm" id="tab-pagi" style="flex:1">☀️ Pagi (07:00)</button>
+      <button class="btn btn-gray btn-sm" id="tab-siang" style="flex:1">🌤️ Siang (13:00)</button>
+    </div>
+    <div id="form-absensi"><div class="empty">Pilih kelas dan tanggal untuk memulai presensi</div></div>
+  </div>
+</div>
+
+<!-- REKAP -->
+<div id="page-rekap" class="hidden">
+  <div class="card">
+    <div class="card-title">📊 Rekapitulasi Absensi</div>
+    <div class="grid-2" style="margin-bottom:15px">
+      <div class="form-group">
+        <label>Periode</label>
+        <select id="rekap-periode"><option value="">Pilih Periode</option></select>
+      </div>
+      <div class="form-group">
+        <label>Kelas (Opsional)</label>
+        <select id="rekap-kelas"><option value="">Semua Kelas</option></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:15px">
+      <button class="btn btn-blue" id="btn-rekap">🔍 Tampilkan</button>
+      <button class="btn btn-gray" id="btn-print">🖨️ Cetak</button>
+    </div>
+    <div id="hasil-rekap"><div class="empty">Pilih periode untuk melihat rekap</div></div>
+  </div>
+</div>
+
+<!-- WHATSAPP -->
+<div id="page-wa" class="hidden">
+  <div class="card">
+    <div class="card-title">💬 Laporan ke Wali Murid</div>
+    <div class="grid-2" style="margin-bottom:15px">
+      <div class="form-group">
+        <label>Kelas</label>
+        <select id="wa-kelas"><option value="">Pilih Kelas</option></select>
+      </div>
+      <div class="form-group">
+        <label>Tanggal</label>
+        <input type="date" id="wa-tanggal">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Filter Status</label>
+      <select id="wa-filter">
+        <option value="all">Semua Status</option>
+        <option value="sakit">Sakit</option>
+        <option value="izin">Izin</option>
+        <option value="alpa">Alpa</option>
+        <option value="tidak-hadir">Tidak Hadir (S/I/A)</option>
+      </select>
+    </div>
+    <div id="wa-list"><div class="empty">Pilih kelas dan tanggal</div></div>
+  </div>
+</div>
+
+<!-- PENGATURAN -->
+<div id="page-setting" class="hidden">
+  <div class="card">
+    <div class="card-title">⚙️ Pengaturan</div>
+    <div class="grid-2">
+      <div class="form-group"><label>Nama Madrasah</label><input type="text" id="set-nama" value="MTs MA'ARIF 22 MOJOSARI"></div>
+      <div class="form-group"><label>Tahun Ajaran</label><input type="text" id="set-tahun" value="2025/2026"></div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Semester</label>
+        <select id="set-semester"><option value="1">Ganjil</option><option value="2">Genap</option></select>
+      </div>
+      <div class="form-group"><label>Kepala Madrasah</label><input type="text" id="set-kepala" placeholder="Nama Kepala Madrasah"></div>
+    </div>
+    <button class="btn btn-blue" id="btn-simpan-set">💾 Simpan</button>
+  </div>
+  <div class="card">
+    <div class="card-title">💾 Backup & Restore</div>
+    <p style="color:#64748b;margin-bottom:15px;font-size:13px">Simpan data Anda sebagai file JSON atau muat data dari backup.</p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-green" id="btn-export">📥 Export Data</button>
+      <label class="btn btn-blue" style="cursor:pointer">📤 Import Data<input type="file" id="btn-import" style="display:none" accept=".json"></label>
+    </div>
+  </div>
+  <div class="card" style="border:2px solid #fee2e2">
+    <div class="card-title" style="color:#dc2626">⚠️ Zona Berbahaya</div>
+    <p style="color:#64748b;margin-bottom:15px;font-size:13px">Menghapus semua data tidak dapat dibatalkan!</p>
+    <button class="btn btn-red" id="btn-reset">🗑️ Reset Semua Data</button>
+  </div>
+</div>
+
+</div>
+
+<!-- MODAL TAMBAH KELAS -->
+<div class="modal-overlay" id="modal-kelas">
+  <div class="modal">
+    <div class="modal-head"><strong>Tambah Kelas Baru</strong><button class="close-btn" data-close="modal-kelas">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nama Kelas</label><input type="text" id="in-nama-kelas" placeholder="Contoh: 7A"></div>
+      <div class="form-group"><label>Wali Kelas</label><input type="text" id="in-wali-kelas" placeholder="Nama Wali Kelas"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-gray" data-close="modal-kelas">Batal</button>
+      <button class="btn btn-blue" id="btn-simpan-kelas">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH SISWA -->
+<div class="modal-overlay" id="modal-siswa">
+  <div class="modal">
+    <div class="modal-head"><strong>Tambah Siswa Baru</strong><button class="close-btn" data-close="modal-siswa">&times;</button></div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="form-group"><label>NISN</label><input type="text" id="in-nisn" placeholder="Nomor Induk"></div>
+        <div class="form-group"><label>Nama Lengkap</label><input type="text" id="in-nama" placeholder="Nama Siswa"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Kelas</label><select id="in-kelas"></select></div>
+        <div class="form-group"><label>Jenis Kelamin</label><select id="in-jk"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+      </div>
+      <div class="form-group"><label>Nama Wali Murid</label><input type="text" id="in-wali" placeholder="Nama Orang Tua"></div>
+      <div class="form-group"><label>No. HP Wali (WhatsApp)</label><input type="text" id="in-hp" placeholder="08123456789"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-gray" data-close="modal-siswa">Batal</button>
+      <button class="btn btn-blue" id="btn-simpan-siswa">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT SISWA -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-head"><strong>Edit Data Siswa</strong><button class="close-btn" data-close="modal-edit">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="grid-2">
+        <div class="form-group"><label>NISN</label><input type="text" id="edit-nisn"></div>
+        <div class="form-group"><label>Nama Lengkap</label><input type="text" id="edit-nama"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Kelas</label><select id="edit-kelas"></select></div>
+        <div class="form-group"><label>Jenis Kelamin</label><select id="edit-jk"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+      </div>
+      <div class="form-group"><label>Nama Wali</label><input type="text" id="edit-wali"></div>
+      <div class="form-group"><label>No. HP Wali</label><input type="text" id="edit-hp"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-gray" data-close="modal-edit">Batal</button>
+      <button class="btn btn-blue" id="btn-update-siswa">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL WA -->
+<div class="modal-overlay" id="modal-wa">
+  <div class="modal">
+    <div class="modal-head"><strong>Kirim WhatsApp</strong><button class="close-btn" data-close="modal-wa">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nomor Tujuan</label><input type="text" id="wa-preview-nomor" readonly></div>
+      <div class="wa-box">
+        <div style="font-weight:700;margin-bottom:5px">📱 Preview Pesan:</div>
+        <div class="wa-msg" id="wa-preview-text"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-gray" data-close="modal-wa">Batal</button>
+      <a class="btn btn-green" id="wa-kirim-link" target="_blank">📤 Kirim WA</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================= DATA =================
+var DB = {
+  kelas: [
+    {id:1, nama:"7A", wali:"Ust. Ahmad Fauzi"},
+    {id:2, nama:"7B", wali:"Ust. Budi Santoso"},
+    {id:3, nama:"8A", wali:"Ust. Cahyono"},
+    {id:4, nama:"8B", wali:"Ust. Dedi Pratama"},
+    {id:5, nama:"9A", wali:"Ust. Eko Wibowo"},
+    {id:6, nama:"9B", wali:"Ust. Fajar Nugroho"}
+  ],
+  siswa: [
+    {id:1, nisn:"1234567890", nama:"Ahmad Rizky", kelasId:1, jk:"L", wali:"Bpk. Sudirman", hp:"081234567890"},
+    {id:2, nisn:"1234567891", nama:"Budi Hartono", kelasId:1, jk:"L", wali:"Ibu Siti Aminah", hp:"081234567891"},
+    {id:3, nisn:"1234567892", nama:"Citra Lestari", kelasId:1, jk:"P", wali:"Bpk. Darmawan", hp:"081234567892"},
+    {id:4, nisn:"1234567893", nama:"Dewi Kusuma", kelasId:1, jk:"P", wali:"Ibu Ratna Sari", hp:"081234567893"},
+    {id:5, nisn:"1234567894", nama:"Eko Prasetyo", kelasId:1, jk:"L", wali:"Bpk. Slamet", hp:"081234567894"},
+    {id:6, nisn:"1234567895", nama:"Fajar Nugroho", kelasId:2, jk:"L", wali:"Ibu Suparni", hp:"081234567895"},
+    {id:7, nisn:"1234567896", nama:"Gita Maharani", kelasId:2, jk:"P", wali:"Bpk. Hadi", hp:"081234567896"},
+    {id:8, nisn:"1234567897", nama:"Hadi Wijaya", kelasId:2, jk:"L", wali:"Ibu Ningsih", hp:"081234567897"},
+    {id:9, nisn:"1234567898", nama:"Indah Permata", kelasId:3, jk:"P", wali:"Bpk. Joko", hp:"081234567898"},
+    {id:10, nisn:"1234567899", nama:"Joko Susilo", kelasId:3, jk:"L", wali:"Ibu Endang", hp:"081234567899"}
+  ],
+  absensi: {},
+  setting: {nama:"MTs MA'ARIF 22 MOJOSARI", tahun:"2025/2026", semester:"1", kepala:""}
+};
+
+function loadDB() {
+  try {
+    var saved = localStorage.getItem('absensiDB');
+    if (saved) {
+      var d = JSON.parse(saved);
+      DB.kelas = d.kelas || DB.kelas;
+      DB.siswa = d.siswa || DB.siswa;
+      DB.absensi = d.absensi || {};
+      DB.setting = d.setting || DB.setting;
+    }
+  } catch(e) {}
+}
+function saveDB() {
+  try { localStorage.setItem('absensiDB', JSON.stringify(DB)); } catch(e) {}
+}
+
+// ================= UTILS =================
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  var colors = {success:'#10b981', error:'#ef4444', warning:'#f59e0b'};
+  t.style.borderLeftColor = colors[type] || colors.success;
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function getKelas(id) { for(var i=0;i<DB.kelas.length;i++) if(DB.kelas[i].id==id) return DB.kelas[i]; return null; }
+function getSiswa(id) { for(var i=0;i<DB.siswa.length;i++) if(DB.siswa[i].id==id) return DB.siswa[i]; return null; }
+function nextId(arr) { var m=0; for(var i=0;i<arr.length;i++) if(arr[i].id>m) m=arr[i].id; return m+1; }
+function fmtDate(d) { return d.toISOString().split('T')[0]; }
+
+// ================= NAVIGASI =================
+function showPage(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(function(el){ el.classList.add('hidden'); });
+  document.getElementById('page-'+page).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('[data-page="'+page+'"]').classList.add('active');
+  if(page==='dashboard') updateDashboard();
+  if(page==='kelas') { renderKelas(); renderSiswa(); }
+  if(page==='absensi') loadAbsensiForm();
+  if(page==='wa') loadWaList();
+}
+
+// ================= DASHBOARD =================
+function updateDashboard() {
+  document.getElementById('d-siswa').textContent = DB.siswa.length;
+  document.getElementById('d-kelas').textContent = DB.kelas.length;
+  var today = fmtDate(new Date());
+  var h=0, th=0, tot=0;
+  for(var k=0;k<DB.kelas.length;k++) {
+    ['pagi','siang'].forEach(function(s){
+      var key = today+'_'+DB.kelas[k].id+'_'+s;
+      var a = DB.absensi[key];
+      if(a) { Object.values(a).forEach(function(st){ tot++; if(st==='hadir') h++; else th++; }); }
+    });
+  }
+  document.getElementById('d-hadir').textContent = tot>0 ? Math.round(h/tot*100)+'%' : '0%';
+  document.getElementById('d-alpa').textContent = th;
+
+  var keys = Object.keys(DB.absensi).sort().reverse().slice(0,5);
+  var html = '';
+  if(keys.length===0) { html = '<div class="empty">Belum ada aktivitas</div>'; }
+  else {
+    html = '<table><thead><tr><th>Tanggal</th><th>Kelas</th><th>Sesi</th><th>Hadir</th><th>Tidak</th></tr></thead><tbody>';
+    for(var i=0;i<keys.length;i++) {
+      var p=keys[i].split('_');
+      var kls=getKelas(p[1]);
+      var a=DB.absensi[keys[i]];
+      var hh=0, tt=0;
+      Object.values(a).forEach(function(st){ if(st==='hadir') hh++; else tt++; });
+      html += '<tr><td>'+p[0]+'</td><td>'+(kls?kls.nama:'-')+'</td><td>'+p[2]+'</td><td>'+hh+'</td><td>'+tt+'</td></tr>';
+    }
+    html += '</tbody></table>';
+  }
+  document.getElementById('d-aktivitas').innerHTML = html;
+}
+
+// ================= KELAS =================
+function renderKelas() {
+  var tb = document.getElementById('list-kelas'); tb.innerHTML='';
+  for(var i=0;i<DB.kelas.length;i++) {
+    var k=DB.kelas[i], c=0;
+    for(var s=0;s<DB.siswa.length;s++) if(DB.siswa[s].kelasId===k.id) c++;
+    var tr=document.createElement('tr');
+    tr.innerHTML = '<td><strong>'+k.nama+'</strong></td><td>'+k.wali+'</td><td>'+c+' siswa</td><td><button class="btn btn-red btn-sm btn-del-kelas" data-id="'+k.id+'">🗑️</button></td>';
+    tb.appendChild(tr);
+  }
+}
+function renderSiswa() {
+  var tb=document.getElementById('list-siswa'), cari=document.getElementById('cari-siswa').value.toLowerCase(), filter=document.getElementById('filter-kelas-siswa').value;
+  tb.innerHTML='';
+  for(var i=0;i<DB.siswa.length;i++) {
+    var s=DB.siswa[i], k=getKelas(s.kelasId); if(!k) continue;
+    if(cari && !s.nama.toLowerCase().includes(cari) && !s.nisn.includes(cari)) continue;
+    if(filter && s.kelasId!=filter) continue;
+    var tr=document.createElement('tr');
+    tr.innerHTML = '<td>'+s.nisn+'</td><td><strong>'+s.nama+'</strong></td><td>'+k.nama+'</td><td>'+(s.jk==='L'?'L':'P')+'</td><td>'+(s.hp||'-')+'</td><td><button class="btn btn-blue btn-sm btn-edit" data-id="'+s.id+'">✏️</button> <button class="btn btn-red btn-sm btn-del-siswa" data-id="'+s.id+'">🗑️</button></td>';
+    tb.appendChild(tr);
+  }
+}
+function populateKelasSelect(selId) {
+  var sel=document.getElementById(selId); sel.innerHTML='';
+  for(var i=0;i<DB.kelas.length;i++) { var o=document.createElement('option'); o.value=DB.kelas[i].id; o.textContent=DB.kelas[i].nama; sel.appendChild(o); }
+}
+function populateAllKelasSelects() {
+  var selects=['filter-kelas-siswa','pilih-kelas-absen','rekap-kelas','wa-kelas'];
+  for(var i=0;i<selects.length;i++) {
+    var sel=document.getElementById(selects[i]); if(!sel) continue;
+    var v=sel.value; sel.innerHTML='<option value="">'+(selects[i]==='filter-kelas-siswa'?'Semua Kelas':'Pilih Kelas')+'</option>';
+    for(var k=0;k<DB.kelas.length;k++) { var o=document.createElement('option'); o.value=DB.kelas[k].id; o.textContent=DB.kelas[k].nama; sel.appendChild(o); }
+    sel.value=v;
+  }
+}
+
+// ================= ABSENSI =================
+var sesiAktif = 'pagi';
+function loadAbsensiForm() {
+  var kelasId=document.getElementById('pilih-kelas-absen').value, tgl=document.getElementById('tgl-absen').value;
+  var div=document.getElementById('form-absensi');
+  if(!kelasId||!tgl) { div.innerHTML='<div class="empty">Pilih kelas dan tanggal</div>'; return; }
+  var siswa=[]; for(var i=0;i<DB.siswa.length;i++) if(DB.siswa[i].kelasId==kelasId) siswa.push(DB.siswa[i]);
+  var key=tgl+'_'+kelasId+'_'+sesiAktif, data=DB.absensi[key]||{};
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px"><strong>Presensi '+sesiAktif.toUpperCase()+' - '+tgl+'</strong><button class="btn btn-green btn-sm" id="btn-simpan-absen">💾 Simpan</button></div>';
+  for(var i=0;i<siswa.length;i++) {
+    var s=siswa[i], st=data[s.id]||'';
+    html+='<div class="attendance-row"><div class="attendance-name">'+(i+1)+'. <strong>'+s.nama+'</strong> <small style="color:#94a3b8">('+s.nisn+')</small></div>';
+    html+='<div class="attendance-options">';
+    html+='<div class="att-opt '+(st==='hadir'?'selected-hadir':'')+'" data-siswa="'+s.id+'" data-val="hadir">✅ Hadir</div>';
+    html+='<div class="att-opt '+(st==='sakit'?'selected-sakit':'')+'" data-siswa="'+s.id+'" data-val="sakit">🤒 Sakit</div>';
+    html+='<div class="att-opt '+(st==='izin'?'selected-izin':'')+'" data-siswa="'+s.id+'" data-val="izin">📝 Izin</div>';
+    html+='<div class="att-opt '+(st==='alpa'?'selected-alpa':'')+'" data-siswa="'+s.id+'" data-val="alpa">❌ Alpa</div>';
+    html+='</div></div>';
+  }
+  div.innerHTML=html;
+
+  // Event delegation for attendance options
+  div.querySelectorAll('.att-opt').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      var sid=this.getAttribute('data-siswa');
+      var row=this.closest('.attendance-row');
+      row.querySelectorAll('.att-opt').forEach(function(o){ o.className='att-opt'; });
+      this.className='att-opt selected-'+this.getAttribute('data-val');
+    });
+  });
+
+  document.getElementById('btn-simpan-absen').addEventListener('click', function(){
+    var hasil={};
+    div.querySelectorAll('.attendance-row').forEach(function(row){
+      var selected=row.querySelector('.att-opt[class*="selected-"]');
+      if(selected) hasil[selected.getAttribute('data-siswa')]=selected.getAttribute('data-val');
+    });
+    DB.absensi[key]=hasil; saveDB(); updateDashboard();
+    toast('Presensi '+sesiAktif+' disimpan!');
+  });
+}
+
+// ================= REKAP =================
+function setupRekapPeriode() {
+  var sel=document.getElementById('rekap-periode'); sel.innerHTML='<option value="">Pilih Periode</option>';
+  var now=new Date();
+  for(var i=0;i<4;i++) {
+    var d=new Date(); d.setDate(d.getDate()-(i*7));
+    var ws=new Date(d); ws.setDate(d.getDate()-d.getDay());
+    var we=new Date(ws); we.setDate(ws.getDate()+6);
+    var o=document.createElement('option'); o.value='mg_'+fmtDate(ws)+'_'+fmtDate(we); o.textContent='Minggu: '+ws.toLocaleDateString('id-ID')+' - '+we.toLocaleDateString('id-ID'); sel.appendChild(o);
+  }
+  for(var i=0;i<6;i++) {
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var o=document.createElement('option'); o.value='bln_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); o.textContent=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'}); sel.appendChild(o);
+  }
+}
+function generateRekap() {
+  var kelasId=document.getElementById('rekap-kelas').value, periode=document.getElementById('rekap-periode').value;
+  if(!periode) { toast('Pilih periode!','warning'); return; }
+  var p=periode.split('_'), tipe=p[0], start, end;
+  if(tipe==='mg') { start=p[1]; end=p[2]; }
+  else { var y=p[1].split('-')[0],m=p[1].split('-')[1]; start=y+'-'+m+'-01'; end=y+'-'+m+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0'); }
+
+  var stats={hadir:0,sakit:0,izin:0,alpa:0,total:0}, ss={};
+  var list=kelasId?DB.siswa.filter(function(s){return s.kelasId==kelasId;}):DB.siswa.slice();
+  for(var i=0;i<list.length;i++) ss[list[i].id]={nama:list[i].nama,nisn:list[i].nisn,hadir:0,sakit:0,izin:0,alpa:0,total:0};
+
+  var keys=Object.keys(DB.absensi);
+  for(var i=0;i<keys.length;i++) {
+    var kd=keys[i].split('_')[0]; if(kd<start||kd>end) continue;
+    var a=DB.absensi[keys[i]], sk=Object.keys(a);
+    for(var j=0;j<sk.length;j++) {
+      var id=parseInt(sk[j]); if(!ss[id]) continue;
+      stats[a[sk[j]]]++; stats.total++; ss[id][a[sk[j]]]++; ss[id].total++;
+    }
+  }
+
+  var html='<div class="stats" style="margin-bottom:20px">';
+  html+='<div class="stat" style="border-color:#10b981"><div class="stat-num">'+stats.hadir+'</div><div class="stat-label">Hadir</div></div>';
+  html+='<div class="stat" style="border-color:#f59e0b"><div class="stat-num">'+stats.sakit+'</div><div class="stat-label">Sakit</div></div>';
+  html+='<div class="stat" style="border-color:#8b5cf6"><div class="stat-num">'+stats.izin+'</div><div class="stat-label">Izin</div></div>';
+  html+='<div class="stat" style="border-color:#ef4444"><div class="stat-num">'+stats.alpa+'</div><div class="stat-label">Alpa</div></div>';
+  html+='</div>';
+  html+='<table><thead><tr><th>No</th><th>NISN</th><th>Nama</th><th>H</th><th>S</th><th>I</th><th>A</th><th>%</th></tr></thead><tbody>';
+  var no=1, sids=Object.keys(ss);
+  for(var i=0;i<sids.length;i++) {
+    var s=ss[sids[i]]; if(s.total===0) continue;
+    var pct=Math.round(s.hadir/s.total*100);
+    html+='<tr><td>'+no+'</td><td>'+s.nisn+'</td><td><strong>'+s.nama+'</strong></td><td>'+s.hadir+'</td><td>'+s.sakit+'</td><td>'+s.izin+'</td><td>'+s.alpa+'</td><td><strong>'+pct+'%</strong></td></tr>';
+    no++;
+  }
+  html+='</tbody></table>';
+  document.getElementById('hasil-rekap').innerHTML=html;
+}
+
+// ================= WA =================
+function loadWaList() {
+  var kelasId=document.getElementById('wa-kelas').value, tgl=document.getElementById('wa-tanggal').value, filter=document.getElementById('wa-filter').value;
+  var div=document.getElementById('wa-list');
+  if(!kelasId||!tgl) { div.innerHTML='<div class="empty">Pilih kelas dan tanggal</div>'; return; }
+  var list=[]; for(var i=0;i<DB.siswa.length;i++) if(DB.siswa[i].kelasId==kelasId) list.push(DB.siswa[i]);
+  var k=getKelas(kelasId);
+  var html='<div style="margin-bottom:10px;font-size:13px;color:#64748b"><strong>'+(k?k.nama:'-')+'</strong> | '+tgl+'</div>';
+  html+='<table><thead><tr><th>Nama</th><th>Pagi</th><th>Siang</th><th>Aksi</th></tr></thead><tbody>';
+  var hasData=false;
+  for(var i=0;i<list.length;i++) {
+    var s=list[i], kp=tgl+'_'+kelasId+'_pagi', ks=tgl+'_'+kelasId+'_siang';
+    var sp=(DB.absensi[kp]&&DB.absensi[kp][s.id])||'-', ss=(DB.absensi[ks]&&DB.absensi[ks][s.id])||'-';
+    var show=true;
+    if(filter!=='all') {
+      if(filter==='tidak-hadir') show=(sp!=='hadir'&&sp!=='-')||(ss!=='hadir'&&ss!=='-');
+      else show=sp===filter||ss===filter;
+    }
+    if(!show) continue; hasData=true;
+    var bh=function(st){return st==='hadir'?'b-hadir':st==='sakit'?'b-sakit':st==='izin'?'b-izin':st==='alpa'?'b-alpa':'';};
+    html+='<tr><td><strong>'+s.nama+'</strong><br><small style="color:#94a3b8">'+(s.wali||'-')+'</small></td>';
+    html+='<td>'+(sp!='-'?'<span class="badge '+bh(sp)+'">'+sp+'</span>':'-')+'</td>';
+    html+='<td>'+(ss!='-'?'<span class="badge '+bh(ss)+'">'+ss+'</span>':'-')+'</td>';
+    html+='<td><button class="btn btn-green btn-sm btn-kirim-wa" data-siswa="'+s.id+'" data-tgl="'+tgl+'">📤 Kirim</button></td></tr>';
+  }
+  html+='</tbody></table>';
+  if(hasData) html+='<div style="margin-top:15px"><button class="btn btn-green" id="btn-kirim-semua" data-kelas="'+kelasId+'" data-tgl="'+tgl+'">📤 Kirim ke Semua Wali</button></div>';
+  else html+='<div style="text-align:center;color:#94a3b8;margin-top:15px">Tidak ada data</div>';
+  div.innerHTML=html;
+
+  div.querySelectorAll('.btn-kirim-wa').forEach(function(b){
+    b.addEventListener('click', function(){ kirimWA(parseInt(this.getAttribute('data-siswa')), this.getAttribute('data-tgl')); });
+  });
+  var semua=document.getElementById('btn-kirim-semua');
+  if(semua) semua.addEventListener('click', function(){ kirimSemua(this.getAttribute('data-kelas'), this.getAttribute('data-tgl')); });
+}
+function kirimWA(sid, tgl) {
+  var s=getSiswa(sid); if(!s||!s.hp) { toast('Nomor HP tidak tersedia!','error'); return; }
+  var k=getKelas(s.kelasId), kp=tgl+'_'+s.kelasId+'_pagi', ks=tgl+'_'+s.kelasId+'_siang';
+  var sp=(DB.absensi[kp]&&DB.absensi[kp][s.id])||'Belum diabsen', ss=(DB.absensi[ks]&&DB.absensi[ks][s.id])||'Belum diabsen';
+  var pesan='*LAPORAN ABSENSI*\n'+DB.setting.nama+'\n\nYth. Bapak/Ibu '+(s.wali||'Wali')+',\n\nLaporan kehadiran putra/putri Anda:\n\nNama: *'+s.nama+'*\nKelas: *'+(k?k.nama:'-')+'*\nTanggal: *'+tgl+'*\n\nPagi: *'+sp.toUpperCase()+'*\nSiang: *'+ss.toUpperCase()+'*\n\nMohon konfirmasi jika tidak hadir.\nTerima kasih.\nWassalamualaikum.';
+  document.getElementById('wa-preview-nomor').value=s.hp;
+  document.getElementById('wa-preview-text').textContent=pesan;
+  document.getElementById('wa-kirim-link').href='https://wa.me/'+s.hp.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(pesan);
+  openModal('modal-wa');
+}
+function kirimSemua(kid, tgl) {
+  var list=[]; for(var i=0;i<DB.siswa.length;i++) if(DB.siswa[i].kelasId==kid&&DB.siswa[i].hp) list.push(DB.siswa[i]);
+  if(list.length===0) { toast('Tidak ada nomor HP!','warning'); return; }
+  var c=0;
+  for(var i=0;i<list.length;i++) {
+    (function(s){
+      setTimeout(function(){
+        var k=getKelas(s.kelasId), kp=tgl+'_'+s.kelasId+'_pagi', ks=tgl+'_'+s.kelasId+'_siang';
+        var sp=(DB.absensi[kp]&&DB.absensi[kp][s.id])||'Belum diabsen', ss=(DB.absensi[ks]&&DB.absensi[ks][s.id])||'Belum diabsen';
+        var pesan='*LAPORAN ABSENSI*\n'+DB.setting.nama+'\n\nYth. Bapak/Ibu '+(s.wali||'Wali')+',\n\nLaporan kehadiran putra/putri Anda:\n\nNama: *'+s.nama+'*\nKelas: *'+(k?k.nama:'-')+'*\nTanggal: *'+tgl+'*\n\nPagi: *'+sp.toUpperCase()+'*\nSiang: *'+ss.toUpperCase()+'*\n\nMohon konfirmasi jika tidak hadir.\nTerima kasih.\nWassalamualaikum.';
+        window.open('https://wa.me/'+s.hp.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(pesan), '_blank');
+      }, c*2000); c++;
+    })(list[i]);
+  }
+  toast('Membuka '+c+' chat WhatsApp...');
+}
+
+// ================= SETTING =================
+function simpanSetting() {
+  DB.setting.nama=document.getElementById('set-nama').value;
+  DB.setting.tahun=document.getElementById('set-tahun').value;
+  DB.setting.semester=document.getElementById('set-semester').value;
+  DB.setting.kepala=document.getElementById('set-kepala').value;
+  saveDB(); toast('Pengaturan disimpan!');
+}
+function exportData() {
+  var blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download='absensi-'+fmtDate(new Date())+'.json'; a.click(); URL.revokeObjectURL(url);
+  toast('Data diexport!');
+}
+function importData(inp) {
+  var f=inp.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(e){
+    try {
+      var d=JSON.parse(e.target.result);
+      if(d.kelas&&d.siswa&&d.absensi) {
+        DB=d; saveDB(); populateAllKelasSelects(); updateDashboard();
+        document.getElementById('set-nama').value=DB.setting.nama;
+        document.getElementById('set-tahun').value=DB.setting.tahun;
+        document.getElementById('set-semester').value=DB.setting.semester;
+        document.getElementById('set-kepala').value=DB.setting.kepala||'';
+        toast('Data diimport!');
+      } else toast('Format tidak valid!','error');
+    } catch(err){ toast('Gagal membaca file!','error'); }
+  };
+  r.readAsText(f); inp.value='';
+}
+
+// ================= INIT =================
+document.addEventListener('DOMContentLoaded', function(){
+  loadDB();
+  populateAllKelasSelects();
+  setupRekapPeriode();
+  updateDashboard();
+  document.getElementById('tgl-absen').value=fmtDate(new Date());
+  document.getElementById('wa-tanggal').value=fmtDate(new Date());
+  document.getElementById('set-nama').value=DB.setting.nama;
+  document.getElementById('set-tahun').value=DB.setting.tahun;
+  document.getElementById('set-semester').value=DB.setting.semester;
+  document.getElementById('set-kepala').value=DB.setting.kepala||'';
+
+  // Navigasi
+  document.querySelectorAll('.nav-btn').forEach(function(b){
+    b.addEventListener('click', function(){ showPage(this.getAttribute('data-page')); });
+  });
+
+  // Modal close
+  document.querySelectorAll('[data-close]').forEach(function(b){
+    b.addEventListener('click', function(){ closeModal(this.getAttribute('data-close')); });
+  });
+  document.querySelectorAll('.modal-overlay').forEach(function(m){
+    m.addEventListener('click', function(e){ if(e.target===this) closeModal(this.id); });
+  });
+
+  // Kelas
+  document.getElementById('btn-tambah-kelas').addEventListener('click', function(){ openModal('modal-kelas'); });
+  document.getElementById('btn-simpan-kelas').addEventListener('click', function(){
+    var nama=document.getElementById('in-nama-kelas').value.trim(), wali=document.getElementById('in-wali-kelas').value.trim();
+    if(!nama||!wali) { toast('Lengkapi data!','warning'); return; }
+    DB.kelas.push({id:nextId(DB.kelas), nama:nama, wali:wali}); saveDB(); renderKelas(); populateAllKelasSelects(); closeModal('modal-kelas');
+    document.getElementById('in-nama-kelas').value=''; document.getElementById('in-wali-kelas').value='';
+    toast('Kelas ditambahkan!');
+  });
+  document.getElementById('list-kelas').addEventListener('click', function(e){
+    var b=e.target.closest('.btn-del-kelas'); if(b) {
+      var id=parseInt(b.getAttribute('data-id'));
+      if(!confirm('Hapus kelas ini?')) return;
+      var nk=[], ns=[];
+      for(var i=0;i<DB.kelas.length;i++) if(DB.kelas[i].id!==id) nk.push(DB.kelas[i]);
+      for(var i=0;i<DB.siswa.length;i++) if(DB.siswa[i].kelasId!==id) ns.push(DB.siswa[i]);
+      DB.kelas=nk; DB.siswa=ns; saveDB(); renderKelas(); renderSiswa(); populateAllKelasSelects(); updateDashboard();
+      toast('Kelas dihapus!');
+    }
+  });
+
+  // Siswa
+  document.getElementById('btn-tambah-siswa').addEventListener('click', function(){ populateKelasSelect('in-kelas'); openModal('modal-siswa'); });
+  document.getElementById('btn-simpan-siswa').addEventListener('click', function(){
+    var nisn=document.getElementById('in-nisn').value.trim(), nama=document.getElementById('in-nama').value.trim(),
+        kelasId=parseInt(document.getElementById('in-kelas').value), jk=document.getElementById('in-jk').value,
+        wali=document.getElementById('in-wali').value.trim(), hp=document.getElementById('in-hp').value.trim();
+    if(!nisn||!nama||!kelasId) { toast('Lengkapi data!','warning'); return; }
+    DB.siswa.push({id:nextId(DB.siswa), nisn:nisn, nama:nama, kelasId:kelasId, jk:jk, wali:wali, hp:hp});
+    saveDB(); renderSiswa(); updateDashboard(); closeModal('modal-siswa');
+    document.getElementById('in-nisn').value=''; document.getElementById('in-nama').value='';
+    document.getElementById('in-wali').value=''; document.getElementById('in-hp').value='';
+    toast('Siswa ditambahkan!');
+  });
+  document.getElementById('list-siswa').addEventListener('click', function(e){
+    var editB=e.target.closest('.btn-edit'), delB=e.target.closest('.btn-del-siswa');
+    if(editB) {
+      var id=parseInt(editB.getAttribute('data-id')), s=getSiswa(id);
+      if(!s) return; populateKelasSelect('edit-kelas');
+      document.getElementById('edit-id').value=s.id;
+      document.getElementById('edit-nisn').value=s.nisn;
+      document.getElementById('edit-nama').value=s.nama;
+      document.getElementById('edit-kelas').value=s.kelasId;
+      document.getElementById('edit-jk').value=s.jk;
+      document.getElementById('edit-wali').value=s.wali||'';
+      document.getElementById('edit-hp').value=s.hp||'';
+      openModal('modal-edit');
+    }
+    if(delB) {
+      var id=parseInt(delB.getAttribute('data-id'));
+      if(!confirm('Hapus siswa ini?')) return;
+      var ns=[]; for(var i=0;i<DB.siswa.length;i++) if(DB.siswa[i].id!==id) ns.push(DB.siswa[i]);
+      DB.siswa=ns; saveDB(); renderSiswa(); updateDashboard(); toast('Siswa dihapus!');
+    }
+  });
+  document.getElementById('btn-update-siswa').addEventListener('click', function(){
+    var id=parseInt(document.getElementById('edit-id').value), s=getSiswa(id);
+    if(!s) return;
+    s.nisn=document.getElementById('edit-nisn').value.trim();
+    s.nama=document.getElementById('edit-nama').value.trim();
+    s.kelasId=parseInt(document.getElementById('edit-kelas').value);
+    s.jk=document.getElementById('edit-jk').value;
+    s.wali=document.getElementById('edit-wali').value.trim();
+    s.hp=document.getElementById('edit-hp').value.trim();
+    saveDB(); renderSiswa(); closeModal('modal-edit'); toast('Data diupdate!');
+  });
+  document.getElementById('cari-siswa').addEventListener('input', renderSiswa);
+  document.getElementById('filter-kelas-siswa').addEventListener('change', renderSiswa);
+
+  // Absensi
+  document.getElementById('tab-pagi').addEventListener('click', function(){ sesiAktif='pagi'; this.className='btn btn-blue btn-sm'; document.getElementById('tab-siang').className='btn btn-gray btn-sm'; loadAbsensiForm(); });
+  document.getElementById('tab-siang').addEventListener('click', function(){ sesiAktif='siang'; this.className='btn btn-blue btn-sm'; document.getElementById('tab-pagi').className='btn btn-gray btn-sm'; loadAbsensiForm(); });
+  document.getElementById('pilih-kelas-absen').addEventListener('change', loadAbsensiForm);
+  document.getElementById('tgl-absen').addEventListener('change', loadAbsensiForm);
+
+  // Rekap
+  document.getElementById('btn-rekap').addEventListener('click', generateRekap);
+  document.getElementById('btn-print').addEventListener('click', function(){ window.print(); });
+
+  // WA
+  document.getElementById('wa-kelas').addEventListener('change', loadWaList);
+  document.getElementById('wa-tanggal').addEventListener('change', loadWaList);
+  document.getElementById('wa-filter').addEventListener('change', loadWaList);
+
+  // Setting
+  document.getElementById('btn-simpan-set').addEventListener('click', simpanSetting);
+  document.getElementById('btn-export').addEventListener('click', exportData);
+  document.getElementById('btn-import').addEventListener('change', function(){ importData(this); });
+  document.getElementById('btn-reset').addEventListener('click', function(){
+    if(!confirm('HAPUS SEMUA DATA?')) return;
+    localStorage.removeItem('absensiDB'); location.reload();
+  });
+});
+</script>
+</body>
+</html>
